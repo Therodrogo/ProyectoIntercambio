@@ -5,6 +5,7 @@
  */
 package intercambioproyecto;
 
+import java.awt.Panel;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -23,6 +24,7 @@ import javafx.scene.layout.Pane;
  * @author Rodrigo
  */
 public class VistaController implements Initializable {
+    
     @FXML
     private Pane panelMemoria;
     @FXML
@@ -41,16 +43,22 @@ public class VistaController implements Initializable {
     private GridPane procesos = new GridPane();
     
     private MemoriaPrincipal memoriaPrincipal;
+    
+    
+    
     int indexProcesosGrid = 0;
     int contadorProcesosGrid = 0;
     
     private ArrayList<Proceso> listaProcesos = new ArrayList();
+    private ArrayList<Proceso> listaMemoria = new ArrayList();
+    private ArrayList<Proceso> listaDisco = new ArrayList();
+    
     
    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        memoria.setPrefSize(183, 279);
+        
         
         panelProcesos.getChildren().add(procesos);
         
@@ -65,24 +73,86 @@ public class VistaController implements Initializable {
         comboBoxPrioridad.getItems().addAll("Alta","Baja");
         
         
-        
-        
-        
-        
-        
-        
-        
-        
     }    
 
     @FXML
     private void ejecutar(ActionEvent event) {
         
         try {
-//            memoriaPrincipal.setProceso(proceso);
-//            memoriaPrincipal.setProceso(proceso2);
+            //Extreamos el primer elemento de nuestra cola
+            if (listaMemoria.size()<13 && listaMemoria.size()+listaProcesos.get(0).getCantBloques()<13) {
+                
+                if (listaMemoria.size()>=0) {
+                    ArrayList<Proceso> borrar = new ArrayList();
+
+                    for (Proceso proceso: listaMemoria) {
+                        if (proceso.getTiempo()==1) {
+                            System.out.println("se borra");
+                            borrar.add(proceso);
+                        }
+                    }
+
+                    for (int i = 0; i < borrar.size(); i++) {
+                        listaMemoria.remove(borrar.get(i));
+                    }
+
+                    for (Proceso proceso: listaMemoria) {
+                        proceso.avanzarTiempo();
+                    }
+                    actualizarGrid(memoria,listaMemoria);
+                }
+                
+                
+                
+                Proceso primerProceso = listaProcesos.remove(0);
+
+                System.out.println(primerProceso.getIdentificador());
+                
+                //Se agrean la cantidad conrrespondientes de bloques del proceso en la memoria
+                for (int i = 0; i < primerProceso.getCantBloques(); i++) {
+                    Proceso aux = new Proceso();
+                    aux.setIdentificador(primerProceso.getIdentificador());
+                    aux.setCantBloques(primerProceso.getCantBloques());
+                    aux.setTiempo(primerProceso.getTiempo());
+                    aux.setPrioridad(primerProceso.getPrioridad());
+                    
+                    listaMemoria.add(aux);
+                    
+                }
+                //Se actualiza el grid de procesos
+                actualizarGrid(procesos,listaProcesos);
+                //Se actualiza el grid de memoria
+                actualizarGrid(memoria,listaMemoria);
+            }
+            else{
+                System.out.println("Limete de memoria superado");
+            }
+            
         
         } catch (Exception e) {
+ 
+            if (listaMemoria.size()>=0) {
+
+                ArrayList<Proceso> borrar = new ArrayList();
+
+                for (Proceso proceso: listaMemoria) {
+                    if (proceso.getTiempo()==1) {
+                        System.out.println("se borra");
+                        borrar.add(proceso);
+                    }
+                }
+
+                for (int i = 0; i < borrar.size(); i++) {
+                    listaMemoria.remove(borrar.get(i));
+                }
+
+                for (Proceso proceso: listaMemoria) {
+                    proceso.avanzarTiempo();
+                }
+                actualizarGrid(memoria,listaMemoria);
+            }
+
+            
         }
 
     }
@@ -106,7 +176,7 @@ public class VistaController implements Initializable {
                 
                 listaProcesos.add(proceso);
                 
-                actualizarGrid();
+                actualizarGrid(procesos,listaProcesos);
  
             }
             else{
@@ -119,17 +189,19 @@ public class VistaController implements Initializable {
  
     }
     
-    public void actualizarGrid(){
-        indexProcesosGrid=0;
-        procesos.getChildren().clear();
+    public void actualizarGrid(GridPane gridPane, ArrayList<Proceso> listaProcesos){
+        int index = 0;
+        gridPane.setGridLinesVisible(true);
+        gridPane.getChildren().clear();
+        
         for (Proceso proceso: listaProcesos) {
            
-            procesos.add(proceso.getItem(), 0, indexProcesosGrid);
-            indexProcesosGrid++;
+            gridPane.add(proceso.getItem(), 0, index);
+            
+            index++;
 
         }
-    
-       
+
     }
     
 }

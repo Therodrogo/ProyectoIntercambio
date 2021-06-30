@@ -63,7 +63,7 @@ public class Proceso {
    
     public Label getItem(){
         
-        item.setText(identificador+" "+tiempo);
+        item.setText("ID: "+identificador+" Tiempo: "+tiempo+" Bloques: "+cantBloques);
         
         return item;
     }

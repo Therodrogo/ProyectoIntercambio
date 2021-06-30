@@ -11,7 +11,7 @@
    <children>
       <Pane fx:id="panelProcesos" layoutX="39.0" layoutY="107.0" prefHeight="395.0" prefWidth="189.0" style="-fx-background-color: grey;" />
       <Pane layoutX="627.0" layoutY="104.0" prefHeight="395.0" prefWidth="189.0" style="-fx-background-color: grey;" />
-      <Pane fx:id="panelMemoria" layoutX="333.0" layoutY="107.0" prefHeight="279.0" prefWidth="183.0" style="-fx-background-color: grey;" />
+      <Pane fx:id="panelMemoria" layoutX="333.0" layoutY="107.0" prefHeight="247.0" prefWidth="246.0" style="-fx-background-color: grey;" />
       <Label layoutX="679.0" layoutY="75.0" text="Almacen (Disco)" />
       <Label layoutX="376.0" layoutY="75.0" text="Memoria Principal" />
       <Label layoutX="74.0" layoutY="75.0" text="Cola de Procesos" />
