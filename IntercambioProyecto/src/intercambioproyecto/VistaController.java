@@ -82,25 +82,7 @@ public class VistaController implements Initializable {
             //Extreamos el primer elemento de nuestra cola
             if (listaMemoria.size()<13 && listaMemoria.size()+listaProcesos.get(0).getCantBloques()<13) {
                 
-                if (listaMemoria.size()>=0) {
-                    ArrayList<Proceso> borrar = new ArrayList();
-
-                    for (Proceso proceso: listaMemoria) {
-                        if (proceso.getTiempo()==1) {
-                            System.out.println("se borra");
-                            borrar.add(proceso);
-                        }
-                    }
-
-                    for (int i = 0; i < borrar.size(); i++) {
-                        listaMemoria.remove(borrar.get(i));
-                    }
-
-                    for (Proceso proceso: listaMemoria) {
-                        proceso.avanzarTiempo();
-                    }
-                    actualizarGrid(memoria,listaMemoria);
-                }
+                avazarTiempoGrid();
                 
                 
                 
@@ -125,19 +107,27 @@ public class VistaController implements Initializable {
                 actualizarGrid(memoria,listaMemoria);
             }
             else{
+                avazarTiempoGrid();
+                
                 System.out.println("Limete de memoria superado");
             }
             
         
         } catch (Exception e) {
  
-            if (listaMemoria.size()>=0) {
+            avazarTiempoGrid();
+
+            
+        }
+
+    }
+    public void avazarTiempoGrid(){
+        if (listaMemoria.size()>=0) {
 
                 ArrayList<Proceso> borrar = new ArrayList();
 
                 for (Proceso proceso: listaMemoria) {
                     if (proceso.getTiempo()==1) {
-                        System.out.println("se borra");
                         borrar.add(proceso);
                     }
                 }
@@ -151,12 +141,7 @@ public class VistaController implements Initializable {
                 }
                 actualizarGrid(memoria,listaMemoria);
             }
-
-            
-        }
-
     }
-
     @FXML
     private void crearProceso(ActionEvent event) {
         try {

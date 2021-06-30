@@ -38,6 +38,13 @@ public class Proceso {
     }
 
     public void setPrioridad(String prioridad) {
+        if (prioridad=="Baja") {
+            item.setStyle("-fx-background-color: #DAFA9E;");
+            
+        }
+        else{
+            item.setStyle("-fx-background-color: #FAA09B;");
+        }
         this.prioridad = prioridad;
     }
 
