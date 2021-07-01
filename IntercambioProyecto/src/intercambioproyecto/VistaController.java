@@ -5,16 +5,13 @@
  */
 package intercambioproyecto;
 
-import java.awt.Panel;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -47,6 +44,12 @@ public class VistaController implements Initializable {
     private ArrayList<Proceso> listaMemoriaUnica = new ArrayList();
     
     private ArrayList<Proceso> listaDisco = new ArrayList();
+    
+    
+    private ArrayList<Proceso> nuevo;
+    
+    @FXML
+    private Pane panelDisco;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -55,6 +58,7 @@ public class VistaController implements Initializable {
         
         panelMemoria.getChildren().add(memoria);
         
+        panelDisco.getChildren().add(disco);
 
         comboBoxCantBloques.getItems().addAll(1,2,3,4,5,6,7,8,9,10);
         comboBoxTiempo.getItems().addAll(1,2,3,4,5,6,7,8,9,10);
@@ -67,9 +71,10 @@ public class VistaController implements Initializable {
     private void ejecutar(ActionEvent event) {
         
         try {
+            
             //Extreamos el primer elemento de nuestra cola
             if (listaMemoria.size()<13 && listaMemoria.size()+listaProcesos.get(0).getCantBloques()<13) {
-                
+
                 avazarTiempoGrid();
                 
                 Proceso primerProceso = listaProcesos.remove(0);
@@ -89,6 +94,10 @@ public class VistaController implements Initializable {
                     listaMemoria.add(aux);
                     
                 }
+                
+                soloPrioridadBaja();
+                ordenarArraylistaPrioridadBaja();
+                
                 //Se actualiza el grid de procesos
                 actualizarGrid(procesos,listaProcesos);
                 //Se actualiza el grid de memoria
@@ -97,30 +106,11 @@ public class VistaController implements Initializable {
             else{
                 
                 System.out.println("Limite de memoria superado"); 
-                
-//                Proceso primerProceso = listaProcesos.get(0);
-//                
-//                if (primerProceso.getPrioridad().equals("Alta")) {
-//                    
-//                    int espacioTotal = primerProceso.getCantBloques();
-//                    
-//                    for (Proceso proceso: listaMemoria) {
-//                        
-//                        
-//                        
-//                    }
-//                    
-//                    
-//                }
-//                else{
-//                    
-//                }
+                //Preguntamos si el proceso que esta en la lista procesos es de prioridad alta
+                swapingToDisco();
+
                 avazarTiempoGrid();
-                
-                
-                
-                
-                
+
             }
             
         
@@ -133,39 +123,207 @@ public class VistaController implements Initializable {
 
     }
     
+    public boolean isPrioridadAlta(Proceso proceso){
+        if (proceso.getPrioridad().equals("Alta")) {
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    }
+    public boolean isPrioridadBajaEnMemoria(){
+        
+        for (Proceso proceso: listaMemoriaUnica) {
+            if (proceso.getPrioridad().equals("Baja")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public int buscarCantBloquesMinimo(){
+        int menor = 500;
+        for (Proceso proceso: listaMemoriaUnica) {
+            if (proceso.getPrioridad().equals("Baja")) {
+                if (proceso.getCantBloques()<menor) {
+                    menor = proceso.getCantBloques();
+                }
+            }
+        }
+        return menor;
+       
+    }
+    public void soloPrioridadBaja(){
+        nuevo = new ArrayList();
+        
+        
+        for (Proceso proceso: listaMemoriaUnica) {
+            
+            if (proceso.getPrioridad().equals("Baja")) {
+                nuevo.add(proceso);
+            }
+        }
+
+        
+    }
+    
+    public void ordenarArraylistaPrioridadBaja(){
+        
+        if (nuevo.size()>1) {
+            ArrayList<Proceso> listaAux= new ArrayList();
+            for (int i = 0; i < nuevo.size()-1; i++) {
+                for (int j = i; j < nuevo.size(); j++) {
+                    if(nuevo.get(i).getCantBloques()>nuevo.get(j).getCantBloques()){
+                        
+                        listaAux.add(nuevo.get(i)); 
+                        nuevo.set(i, nuevo.get(j)); 
+                        nuevo.set(j, listaAux.get(0));
+                        listaAux = new ArrayList();
+                    }
+                }
+            }
+            for (int i = 0; i < nuevo.size(); i++) {
+                System.out.print(nuevo.get(i).getCantBloques());
+
+            } 
+
+        }
+    
+    }
+    
+    public ArrayList<Proceso> verificarEspacio(Proceso primerProceso){
+        
+        ArrayList<Proceso> cambiarDisco = new ArrayList();
+        
+        //Caso1
+        for (Proceso proceso: nuevo) {
+            
+            int total =  proceso.getCantBloques();
+            
+            if (primerProceso.getCantBloques()<=total) {
+                cambiarDisco.add(proceso);
+                return cambiarDisco;
+            }
+            
+        }
+        
+        //Caso2
+        int total2 = 0;
+        for (Proceso proceso: nuevo) {
+            
+            total2 =  total2 + proceso.getCantBloques();
+            
+            if (primerProceso.getCantBloques()<=total2) {
+                cambiarDisco.add(proceso);
+                return cambiarDisco;
+            }
+            else{
+                cambiarDisco.add(proceso);
+
+            }
+        }
+        
+        return null;
+    }
     
     public void swapingToDisco(){
     
         Proceso primerProceso = listaProcesos.get(0);
-        
-        
-        if (primerProceso.getPrioridad().equals("Alta")) {
+
+        if (isPrioridadAlta(primerProceso)) {
             
-            boolean hayPrioridadBaja = false;
-            
-            //Cambiar lista memoria
-            for (Proceso proceso: listaMemoriaUnica) {
-                if (proceso.getPrioridad().equals("Baja")) {
-                    hayPrioridadBaja = true;
+            if (isPrioridadBajaEnMemoria()) {
+                soloPrioridadBaja();
+                ordenarArraylistaPrioridadBaja();
+                ArrayList<Proceso> toDisco = verificarEspacio(primerProceso);
+                
+                if (toDisco!=null) {
+                    
+                    Proceso procesoCorrecto = listaProcesos.remove(0);
+                    
+                    for (Proceso proceso: toDisco) {
+                        //Funcion para borrar 
+                        borrarElementos(toDisco, listaMemoriaUnica);
+                        borrarElementosMemoria(toDisco, listaMemoria);
+                        
+                        listaDisco.add(proceso);
+                        
+                    }
+                    System.out.println("tamaño");
+                    System.out.println(listaMemoria.size());
+                    
+                    listaMemoriaUnica.add(procesoCorrecto);
+                    
+                    //Se crea el proceso ingresado al grid
+                    for (int i = 0; i < procesoCorrecto.getCantBloques(); i++) {
+                        Proceso aux = new Proceso();
+                        aux.setIdentificador(procesoCorrecto.getIdentificador());
+                        aux.setCantBloques(procesoCorrecto.getCantBloques());
+                        aux.setTiempo(procesoCorrecto.getTiempo());
+                        aux.setPrioridad(procesoCorrecto.getPrioridad());
+
+                        listaMemoria.add(aux);
+                    }
+
+                    actualizarGrid(disco, listaDisco);
+                    actualizarGrid(memoria, listaMemoria);
+                    actualizarGrid(procesos, listaProcesos);
+       
                 }
                 
+                
+
             }
-            
-            if (hayPrioridadBaja) {
-                
-                
-                
-                
-                
-                
+            else{
+                System.out.println("No hay prioridad baja en la memoria.");
             }
             
             
             
         }
+        else{
+            
+            //cambiasos desde el disco a la memoria
+            
+            if (listaDisco.size()>0) {
+                
+                
+                
+                
+            }
+            else{
+                System.out.println("No hay procesos en espera.");
+            }
+            
+            
+            System.out.println("No es prioridad alta.");
+        }
     
     }
     
+    
+    public void swapingDiscoToMemoria(){
+    
+        Proceso primerProcesoDisco = listaDisco.remove(0);
+        
+        listaMemoriaUnica.add(primerProcesoDisco);
+        
+        //Se crea el proceso ingresado al grid
+        for (int i = 0; i < primerProcesoDisco.getCantBloques(); i++) {
+            Proceso aux = new Proceso();
+            aux.setIdentificador(primerProcesoDisco.getIdentificador());
+            aux.setCantBloques(primerProcesoDisco.getCantBloques());
+            aux.setTiempo(primerProcesoDisco.getTiempo());
+            aux.setPrioridad(primerProcesoDisco.getPrioridad());
+
+            listaMemoria.add(aux);
+        }
+        
+        actualizarGrid(disco, listaDisco);
+        actualizarGrid(memoria, listaMemoria);
+        
+    }
     
     public void avazarTiempoGrid(){
         
@@ -182,10 +340,8 @@ public class VistaController implements Initializable {
                 }
                 for (int i = 0; i < borrar.size(); i++) {
                     
-                    listaMemoria.remove(borrar.get(i));
-                    
+                    listaMemoria.remove(borrar.get(i)); 
                 }
-
                 for (Proceso proceso: listaMemoria) {
                     proceso.avanzarTiempo();
                 }
@@ -196,30 +352,24 @@ public class VistaController implements Initializable {
                         borrarUnica.add(proceso);
                     }
                 }
-                
                 for (int i = 0; i < borrarUnica.size(); i++) {
-                    
                     listaMemoriaUnica.remove(borrarUnica.get(i));
-                    
                 }
-                
                 for (Proceso proceso: listaMemoriaUnica) {
                     proceso.avanzarTiempo();
                 }
-                System.out.println("BORAR UNICA");
                 
-                System.out.println(listaMemoriaUnica.size());
                 
                 actualizarGrid(memoria,listaMemoria);
             }
     }
-    
+    int contadorProceso=0;
     @FXML
     private void crearProceso(ActionEvent event) {
         try {
             if (listaProcesos.size() <19) {
 
-                String id = tfIdentificador.getText();
+                String id = "000"+contadorProceso;
                 String prioridad = comboBoxPrioridad.getSelectionModel().getSelectedItem();
                 int cantBloques = comboBoxCantBloques.getSelectionModel().getSelectedItem();
                 int tiempo = comboBoxTiempo.getSelectionModel().getSelectedItem();
@@ -234,6 +384,7 @@ public class VistaController implements Initializable {
                 listaProcesos.add(proceso);
                 
                 actualizarGrid(procesos,listaProcesos);
+                contadorProceso++;
  
             }
             else{
@@ -261,4 +412,41 @@ public class VistaController implements Initializable {
 
     }
     
+    public void borrarElementos(ArrayList<Proceso> borrar,ArrayList<Proceso> lista2){
+    
+        for (int i = 0; i < borrar.size(); i++) {
+
+            lista2.remove(borrar.get(i)); 
+        }
+
+    }
+    
+    public void borrarElementosMemoria(ArrayList<Proceso> borrar,ArrayList<Proceso> lista2){
+        
+        ArrayList<Proceso> listaBorrar = new ArrayList();
+        
+        for (int i = 0; i < borrar.size(); i++) {
+            for (int j = 0; j < lista2.size(); j++) {
+                
+                if (borrar.get(i).getIdentificador().equals(lista2.get(j).getIdentificador())) {
+                    
+                    System.out.println(borrar.get(i).getIdentificador()+"--"+lista2.get(j).getIdentificador());
+                    
+                    listaBorrar.add(lista2.get(j));
+//                    
+//                    lista2.remove(j);
+//                    j--;
+                }
+            }
+            
+        }
+        
+        for (int i = 0; i < listaBorrar.size(); i++) {
+            
+           lista2.remove(listaBorrar.get(i));
+            
+        }
+        
+    
+    }
 }
