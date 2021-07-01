@@ -71,18 +71,41 @@ public class VistaController implements Initializable {
     private void ejecutar(ActionEvent event) {
         
         try {
+            Proceso validar;
+            if (!listaProcesos.isEmpty()) {
+                validar = listaProcesos.get(0);
+            }
+            else{
+                validar=null;
+            }
             
-            //Extreamos el primer elemento de nuestra cola
+            if (validar==null || isPrioridadAlta(validar)==false  ) {
+                
+                if (listaDisco.size()>0) {
+                    
+                    if (listaMemoria.size()<13 && listaMemoria.size()+listaDisco.get(0).getCantBloques()<13) {
+                        
+                        swapingDiscoToMemoria();
+
+                    }
+                    else{
+                        System.out.println("Limite de memoria");
+                    }
+                    
+                }
+                
+            }
+                //Extreamos el primer elemento de nuestra cola
             if (listaMemoria.size()<13 && listaMemoria.size()+listaProcesos.get(0).getCantBloques()<13) {
 
                 avazarTiempoGrid();
-                
+
                 Proceso primerProceso = listaProcesos.remove(0);
 
                 System.out.println(primerProceso.getIdentificador());
-                
+
                 listaMemoriaUnica.add(primerProceso);
-                
+
                 //Se agrean la cantidad conrrespondientes de bloques del proceso en la memoria
                 for (int i = 0; i < primerProceso.getCantBloques(); i++) {
                     Proceso aux = new Proceso();
@@ -90,21 +113,21 @@ public class VistaController implements Initializable {
                     aux.setCantBloques(primerProceso.getCantBloques());
                     aux.setTiempo(primerProceso.getTiempo());
                     aux.setPrioridad(primerProceso.getPrioridad());
-                    
+
                     listaMemoria.add(aux);
-                    
+
                 }
-                
+
                 soloPrioridadBaja();
                 ordenarArraylistaPrioridadBaja();
-                
+
                 //Se actualiza el grid de procesos
                 actualizarGrid(procesos,listaProcesos);
                 //Se actualiza el grid de memoria
                 actualizarGrid(memoria,listaMemoria);
             }
             else{
-                
+
                 System.out.println("Limite de memoria superado"); 
                 //Preguntamos si el proceso que esta en la lista procesos es de prioridad alta
                 swapingToDisco();
@@ -112,10 +135,10 @@ public class VistaController implements Initializable {
                 avazarTiempoGrid();
 
             }
-            
+
         
         } catch (Exception e) {
- 
+           
             avazarTiempoGrid();
 
             
@@ -142,22 +165,10 @@ public class VistaController implements Initializable {
         return false;
     }
     
-    public int buscarCantBloquesMinimo(){
-        int menor = 500;
-        for (Proceso proceso: listaMemoriaUnica) {
-            if (proceso.getPrioridad().equals("Baja")) {
-                if (proceso.getCantBloques()<menor) {
-                    menor = proceso.getCantBloques();
-                }
-            }
-        }
-        return menor;
-       
-    }
+   
     public void soloPrioridadBaja(){
         nuevo = new ArrayList();
-        
-        
+
         for (Proceso proceso: listaMemoriaUnica) {
             
             if (proceso.getPrioridad().equals("Baja")) {
@@ -224,14 +235,18 @@ public class VistaController implements Initializable {
             }
         }
         
-        return null;
+        //Caso 3
+//        cambiarDisco.add(nuevo.get(0));
+//        return cambiarDisco;
+     
+        return cambiarDisco;
     }
     
     public void swapingToDisco(){
     
         Proceso primerProceso = listaProcesos.get(0);
-
-        if (isPrioridadAlta(primerProceso)) {
+        //listaMemoria.size()<13 && listaMemoria.size()+primerProceso.getCantBloques()<13
+        if (isPrioridadAlta(primerProceso) ) {
             
             if (isPrioridadBajaEnMemoria()) {
                 soloPrioridadBaja();
@@ -433,9 +448,6 @@ public class VistaController implements Initializable {
                     System.out.println(borrar.get(i).getIdentificador()+"--"+lista2.get(j).getIdentificador());
                     
                     listaBorrar.add(lista2.get(j));
-//                    
-//                    lista2.remove(j);
-//                    j--;
                 }
             }
             
