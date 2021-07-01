@@ -9,9 +9,7 @@
 
 <AnchorPane id="AnchorPane" prefHeight="530.0" prefWidth="849.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="intercambioproyecto.VistaController">
    <children>
-      <Pane fx:id="panelProcesos" layoutX="39.0" layoutY="107.0" prefHeight="395.0" prefWidth="189.0" style="-fx-background-color: grey;" />
-      <Pane layoutX="627.0" layoutY="104.0" prefHeight="395.0" prefWidth="189.0" style="-fx-background-color: grey;" />
-      <Pane fx:id="panelMemoria" layoutX="302.0" layoutY="107.0" prefHeight="247.0" prefWidth="245.0" style="-fx-background-color: grey;" />
+      <Pane fx:id="panelMemoria" layoutX="305.0" layoutY="105.0" prefHeight="247.0" prefWidth="245.0" style="-fx-background-color: grey;" />
       <Label layoutX="679.0" layoutY="75.0" text="Almacen (Disco)" />
       <Label layoutX="376.0" layoutY="75.0" text="Memoria Principal" />
       <Label layoutX="74.0" layoutY="75.0" text="Cola de Procesos" />
@@ -20,10 +18,12 @@
       <Label layoutX="187.0" layoutY="3.0" text="Cantidad de bloques" />
       <Label layoutX="363.0" layoutY="5.0" text="Prioridad" />
       <Label layoutX="517.0" layoutY="3.0" text="Tiempo" />
-      <Button layoutX="333.0" layoutY="430.0" mnemonicParsing="false" onAction="#ejecutar" text="prueba" />
+      <Button layoutX="758.0" layoutY="27.0" mnemonicParsing="false" onAction="#ejecutar" text="Ejecutar" />
       <ComboBox fx:id="comboBoxCantBloques" layoutX="182.0" layoutY="27.0" prefHeight="26.0" prefWidth="130.0" />
       <ComboBox fx:id="comboBoxPrioridad" layoutX="333.0" layoutY="27.0" prefHeight="26.0" prefWidth="130.0" />
       <ComboBox fx:id="comboBoxTiempo" layoutX="491.0" layoutY="27.0" prefHeight="26.0" prefWidth="130.0" />
-      <Button layoutX="697.0" layoutY="27.0" mnemonicParsing="false" onAction="#crearProceso" text="Crear Proceso" />
+      <Button layoutX="642.0" layoutY="27.0" mnemonicParsing="false" onAction="#crearProceso" text="Crear Proceso" />
+      <Pane fx:id="panelDisco" layoutX="598.0" layoutY="106.0" prefHeight="395.0" prefWidth="246.0" style="-fx-background-color: grey;" />
+      <Pane fx:id="panelProcesos" layoutX="12.0" layoutY="104.0" prefHeight="395.0" prefWidth="246.0" style="-fx-background-color: grey;" />
    </children>
 </AnchorPane>
