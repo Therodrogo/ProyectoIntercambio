@@ -12,20 +12,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 /**
  *
- * @author Rodrigo
+ * @author Rodrigo - Sabastian
  */
 public class VistaController implements Initializable {
     
     @FXML
     private Pane panelMemoria;
-    @FXML
-    private TextField tfIdentificador;
     @FXML
     private ComboBox<Integer> comboBoxCantBloques;
     @FXML
@@ -34,22 +31,24 @@ public class VistaController implements Initializable {
     private ComboBox<Integer> comboBoxTiempo;
     @FXML
     private Pane panelProcesos;
+    @FXML
+    private Pane panelDisco;
     
+    //GridPane para cada tiempo de procedimento
     private GridPane memoria = new GridPane();
     private GridPane procesos = new GridPane();
     private GridPane disco = new GridPane();
     
+    //Estruturas de datos para almacenar los procesos en sus diferentes estados visualmente
     private ArrayList<Proceso> listaProcesos = new ArrayList();
     private ArrayList<Proceso> listaMemoria = new ArrayList();
-    private ArrayList<Proceso> listaMemoriaUnica = new ArrayList();
-    
     private ArrayList<Proceso> listaDisco = new ArrayList();
     
-    
+    //Estructuras para el manejo del swaping
+    private ArrayList<Proceso> listaMemoriaUnica = new ArrayList();
     private ArrayList<Proceso> nuevo;
     
-    @FXML
-    private Pane panelDisco;
+    private int contadorProceso=0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -66,11 +65,14 @@ public class VistaController implements Initializable {
         
         
     }    
-
+    
+    
+    //Metodo principal que realizar cada accion con sus respectivas validaciones.
     @FXML
     private void ejecutar(ActionEvent event) {
         
         try {
+            //Validar si la cola de procesos esta vacio o tiene elementos.
             Proceso validar;
             if (!listaProcesos.isEmpty()) {
                 validar = listaProcesos.get(0);
@@ -79,12 +81,14 @@ public class VistaController implements Initializable {
                 validar=null;
             }
             
+            //Validar si tenemos elementos en el disco, en este caso si tenemos procesos en lista de espera.
             if (validar==null || isPrioridadAlta(validar)==false  ) {
                 
                 if (listaDisco.size()>0) {
                     
                     if (listaMemoria.size()<13 && listaMemoria.size()+listaDisco.get(0).getCantBloques()<13) {
                         
+                        //Si hay procesos es espera, estos vuleven a la memoria principal para finalizar su ejecucion.
                         swapingDiscoToMemoria();
 
                     }
@@ -95,17 +99,18 @@ public class VistaController implements Initializable {
                 }
                 
             }
-                //Extreamos el primer elemento de nuestra cola
+            
+            //En esta parte se valida que haya espacio en la memoria para ingresar los precesos de la cola de procesos.
             if (listaMemoria.size()<13 && listaMemoria.size()+listaProcesos.get(0).getCantBloques()<13) {
-
+                
+                
                 avazarTiempoGrid();
-
+                
                 Proceso primerProceso = listaProcesos.remove(0);
 
                 System.out.println(primerProceso.getIdentificador());
 
                 listaMemoriaUnica.add(primerProceso);
-
                 //Se agrean la cantidad conrrespondientes de bloques del proceso en la memoria
                 for (int i = 0; i < primerProceso.getCantBloques(); i++) {
                     Proceso aux = new Proceso();
@@ -113,23 +118,21 @@ public class VistaController implements Initializable {
                     aux.setCantBloques(primerProceso.getCantBloques());
                     aux.setTiempo(primerProceso.getTiempo());
                     aux.setPrioridad(primerProceso.getPrioridad());
-
                     listaMemoria.add(aux);
 
                 }
-
+                
                 soloPrioridadBaja();
                 ordenarArraylistaPrioridadBaja();
-
                 //Se actualiza el grid de procesos
                 actualizarGrid(procesos,listaProcesos);
                 //Se actualiza el grid de memoria
                 actualizarGrid(memoria,listaMemoria);
             }
             else{
-
-                System.out.println("Limite de memoria superado"); 
                 //Preguntamos si el proceso que esta en la lista procesos es de prioridad alta
+                //para luego realizar la liberacion de memoria para que este procesode de prioridad alta
+                //ingrese a la memoria.
                 swapingToDisco();
 
                 avazarTiempoGrid();
@@ -138,14 +141,12 @@ public class VistaController implements Initializable {
 
         
         } catch (Exception e) {
-           
             avazarTiempoGrid();
-
-            
         }
 
     }
     
+    //Validamos si el proceso entrante es de prioridad alta
     public boolean isPrioridadAlta(Proceso proceso){
         if (proceso.getPrioridad().equals("Alta")) {
             return true;
@@ -155,6 +156,8 @@ public class VistaController implements Initializable {
         }
         
     }
+    
+    //Validamos si el existen procesos de prioridad baja en la memoria.
     public boolean isPrioridadBajaEnMemoria(){
         
         for (Proceso proceso: listaMemoriaUnica) {
@@ -165,7 +168,8 @@ public class VistaController implements Initializable {
         return false;
     }
     
-   
+    //Generamos un arreglo con solo los procesos de prioridad baja para luego derterminar la asgnacin de espacio 
+    //para el proceso de mayor prioridad.
     public void soloPrioridadBaja(){
         nuevo = new ArrayList();
 
@@ -178,7 +182,7 @@ public class VistaController implements Initializable {
 
         
     }
-    
+    //Se ordena la lista de procesos de prioridad baja de menor a mayor
     public void ordenarArraylistaPrioridadBaja(){
         
         if (nuevo.size()>1) {
@@ -203,6 +207,7 @@ public class VistaController implements Initializable {
     
     }
     
+    //Verifica el espacio necesario para que el proceos de meyor prioridad entre a la memoria.
     public ArrayList<Proceso> verificarEspacio(Proceso primerProceso){
         
         ArrayList<Proceso> cambiarDisco = new ArrayList();
@@ -235,18 +240,19 @@ public class VistaController implements Initializable {
             }
         }
         
-        //Caso 3
-//        cambiarDisco.add(nuevo.get(0));
-//        return cambiarDisco;
-     
-        return cambiarDisco;
+        if (listaMemoria.size()<13 && listaMemoria.size()+primerProceso.getCantBloques()<13) {
+            return cambiarDisco;
+        }
+        
+        return null;
     }
     
+    //Metodo principal para el cambio desde la memoria al disco con todas sus validaciones correspondientes.
     public void swapingToDisco(){
     
         Proceso primerProceso = listaProcesos.get(0);
-        //listaMemoria.size()<13 && listaMemoria.size()+primerProceso.getCantBloques()<13
-        if (isPrioridadAlta(primerProceso) ) {
+        
+        if (isPrioridadAlta(primerProceso)) {
             
             if (isPrioridadBajaEnMemoria()) {
                 soloPrioridadBaja();
@@ -265,9 +271,6 @@ public class VistaController implements Initializable {
                         listaDisco.add(proceso);
                         
                     }
-                    System.out.println("tamaño");
-                    System.out.println(listaMemoria.size());
-                    
                     listaMemoriaUnica.add(procesoCorrecto);
                     
                     //Se crea el proceso ingresado al grid
@@ -286,38 +289,20 @@ public class VistaController implements Initializable {
                     actualizarGrid(procesos, listaProcesos);
        
                 }
-                
-                
-
             }
             else{
                 System.out.println("No hay prioridad baja en la memoria.");
             }
-            
-            
-            
+   
         }
         else{
-            
-            //cambiasos desde el disco a la memoria
-            
-            if (listaDisco.size()>0) {
-                
-                
-                
-                
-            }
-            else{
-                System.out.println("No hay procesos en espera.");
-            }
-            
-            
+
             System.out.println("No es prioridad alta.");
         }
     
     }
     
-    
+    //Metodo para el intercambio desde el disco hacia la memoria
     public void swapingDiscoToMemoria(){
     
         Proceso primerProcesoDisco = listaDisco.remove(0);
@@ -340,6 +325,7 @@ public class VistaController implements Initializable {
         
     }
     
+    //Metodo para avanzar el tiempo de los procesos en memoria
     public void avazarTiempoGrid(){
         
         if (listaMemoria.size()>=0) {
@@ -378,7 +364,9 @@ public class VistaController implements Initializable {
                 actualizarGrid(memoria,listaMemoria);
             }
     }
-    int contadorProceso=0;
+    
+    
+    //Se crean los procesos con los datos ingresados en la interfaz
     @FXML
     private void crearProceso(ActionEvent event) {
         try {
@@ -412,9 +400,10 @@ public class VistaController implements Initializable {
  
     }
     
+    //Recarga la visualizacion de los grid de la pantalla
     public void actualizarGrid(GridPane gridPane, ArrayList<Proceso> listaProcesos){
         int index = 0;
-        gridPane.setGridLinesVisible(true);
+        
         gridPane.getChildren().clear();
         
         for (Proceso proceso: listaProcesos) {
@@ -426,7 +415,7 @@ public class VistaController implements Initializable {
         }
 
     }
-    
+    //Borra elementos de la lista con otro lista
     public void borrarElementos(ArrayList<Proceso> borrar,ArrayList<Proceso> lista2){
     
         for (int i = 0; i < borrar.size(); i++) {
@@ -436,6 +425,7 @@ public class VistaController implements Initializable {
 
     }
     
+    //Borra elementos del grid de memoria que estan repetidos la cantidad de bloques definidos.
     public void borrarElementosMemoria(ArrayList<Proceso> borrar,ArrayList<Proceso> lista2){
         
         ArrayList<Proceso> listaBorrar = new ArrayList();
@@ -445,20 +435,15 @@ public class VistaController implements Initializable {
                 
                 if (borrar.get(i).getIdentificador().equals(lista2.get(j).getIdentificador())) {
                     
-                    System.out.println(borrar.get(i).getIdentificador()+"--"+lista2.get(j).getIdentificador());
-                    
                     listaBorrar.add(lista2.get(j));
                 }
             }
             
         }
-        
         for (int i = 0; i < listaBorrar.size(); i++) {
             
            lista2.remove(listaBorrar.get(i));
             
         }
-        
-    
     }
 }

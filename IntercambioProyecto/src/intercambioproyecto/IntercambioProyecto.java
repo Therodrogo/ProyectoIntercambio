@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author Rodrigo
+ * @author Rodrigo - Sabastian
  */
 public class IntercambioProyecto extends Application {
     

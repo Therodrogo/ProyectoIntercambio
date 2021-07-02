@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
 
 /**
  *
- * @author Rodrigo
+ * @author Rodrigo - Sabastian
  */
 
 
@@ -23,6 +23,7 @@ public class Proceso {
     private Label item = new Label();
 
     public Proceso(){
+        item.setPrefWidth(255);
     }
     
     public String getIdentificador() {
@@ -38,7 +39,9 @@ public class Proceso {
     }
 
     public void setPrioridad(String prioridad) {
+        
         if (prioridad=="Baja") {
+            
             item.setStyle("-fx-background-color: #DAFA9E;");
             
         }
