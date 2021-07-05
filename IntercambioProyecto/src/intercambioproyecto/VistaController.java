@@ -84,20 +84,15 @@ public class VistaController implements Initializable {
             //Validar si tenemos elementos en el disco, en este caso si tenemos procesos en lista de espera.
             if (validar==null || isPrioridadAlta(validar)==false  ) {
                 
-                if (listaDisco.size()>0) {
-                    
-                    if (listaMemoria.size()<13 && listaMemoria.size()+listaDisco.get(0).getCantBloques()<13) {
-                        
+                if (listaDisco.size()>0) {                   
+                    if (listaMemoria.size()<13 && listaMemoria.size()+listaDisco.get(0).getCantBloques()<13) {                       
                         //Si hay procesos es espera, estos vuleven a la memoria principal para finalizar su ejecucion.
                         swapingDiscoToMemoria();
-
                     }
                     else{
                         System.out.println("Limite de memoria");
-                    }
-                    
-                }
-                
+                    }            
+                }              
             }
             
             //En esta parte se valida que haya espacio en la memoria para ingresar los precesos de la cola de procesos.
@@ -212,12 +207,13 @@ public class VistaController implements Initializable {
         
         ArrayList<Proceso> cambiarDisco = new ArrayList();
         
+        int totalDisponible = 12 - listaMemoria.size();
         //Caso1
         for (Proceso proceso: nuevo) {
             
             int total =  proceso.getCantBloques();
             
-            if (primerProceso.getCantBloques()<=total) {
+            if (primerProceso.getCantBloques()<=totalDisponible+total) {
                 cambiarDisco.add(proceso);
                 return cambiarDisco;
             }
@@ -230,7 +226,7 @@ public class VistaController implements Initializable {
             
             total2 =  total2 + proceso.getCantBloques();
             
-            if (primerProceso.getCantBloques()<=total2) {
+            if (primerProceso.getCantBloques()<=totalDisponible+total2) {
                 cambiarDisco.add(proceso);
                 return cambiarDisco;
             }
@@ -240,9 +236,10 @@ public class VistaController implements Initializable {
             }
         }
         
-        if (listaMemoria.size()<13 && listaMemoria.size()+primerProceso.getCantBloques()<13) {
-            return cambiarDisco;
-        }
+//        int aux = cambiarDisco.get(0).getCantBloques();
+//        if (listaMemoria.size()<13 && listaMemoria.size()+primerProceso.getCantBloques()+aux<13) {
+//            return cambiarDisco;
+//        }
         
         return null;
     }
@@ -253,8 +250,9 @@ public class VistaController implements Initializable {
         Proceso primerProceso = listaProcesos.get(0);
         
         if (isPrioridadAlta(primerProceso)) {
-            
+            System.out.println("hola");
             if (isPrioridadBajaEnMemoria()) {
+                System.out.println("hola 2");
                 soloPrioridadBaja();
                 ordenarArraylistaPrioridadBaja();
                 ArrayList<Proceso> toDisco = verificarEspacio(primerProceso);
@@ -403,14 +401,15 @@ public class VistaController implements Initializable {
     //Recarga la visualizacion de los grid de la pantalla
     public void actualizarGrid(GridPane gridPane, ArrayList<Proceso> listaProcesos){
         int index = 0;
-        
+
         gridPane.getChildren().clear();
         
         for (Proceso proceso: listaProcesos) {
-           
+            proceso.setNumeroPantalla(index);
             gridPane.add(proceso.getItem(), 0, index);
-            
+
             index++;
+    
 
         }
 

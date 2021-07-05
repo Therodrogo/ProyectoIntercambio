@@ -14,7 +14,15 @@ import javafx.scene.control.Label;
 
 
 public class Proceso {
-    
+    private int numeroPantalla; 
+
+    public int getNumeroPantalla() {
+        return numeroPantalla;
+    }
+
+    public void setNumeroPantalla(int numeroPantalla) {
+        this.numeroPantalla = numeroPantalla;
+    }
     private String identificador;
     private String prioridad;
     
@@ -73,7 +81,7 @@ public class Proceso {
    
     public Label getItem(){
         
-        item.setText("ID: "+identificador+" Tiempo: "+tiempo+" Bloques: "+cantBloques);
+        item.setText(numeroPantalla+". "+"ID: "+identificador+" Tiempo: "+tiempo+" Bloques: "+cantBloques);
         
         return item;
     }
